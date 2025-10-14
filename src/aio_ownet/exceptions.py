@@ -48,22 +48,6 @@ class OWServerShortReadError(OWServerProtocolError):
         return f"received {self.read} bytes instead of {self.expected}."
 
 
-class OWServerTimeoutError(OWServerError):
-    """Raised if response of server takes longer than a given timeout."""
-
-    def __init__(self, elapsed: float, timeout: int) -> None:
-        """Initialize the error."""
-        self.elapsed = elapsed
-        self.timeout = timeout
-
-    def __str__(self) -> str:
-        """Return a string representation of the error."""
-        return (
-            f"Communication with owserver aborted after {self.elapsed:.1f}s, "
-            f"timeout of {self.timeout:.1f}s exceeded"
-        )
-
-
 class OWServerReturnError(OWServerError):
     """Raised when owserver returns error code."""
 
