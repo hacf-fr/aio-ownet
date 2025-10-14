@@ -1,0 +1,10 @@
+{
+  "_template": "gh:cjolowicz/cookiecutter-hypermodern-python",
+  "author": "epenet",
+  "email": "mail@tbd.com",
+  "friendly_name": "Async OWFS (owserver) client",
+  "github_user": "hacf-fr",
+  "package_name": "aio_ownet",
+  "project_name": "aio-ownet",
+  "version": "0.0.0"
+}
