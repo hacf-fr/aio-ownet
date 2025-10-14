@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "aio-ownet"
-version = "0.0.3"
+version = "0.0.4"
 description = "Async OWFS (owserver) client"
 authors = ["epenet", "HACF <contact@hacf.fr>"]
 license = "MIT"
