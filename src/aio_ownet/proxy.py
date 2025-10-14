@@ -37,7 +37,7 @@ class OWServerStatelessProxy:
                 return self._return_code_messages[ret]
         return "Unknown return code"
 
-    async def validate(self) -> str:
+    async def validate(self) -> None:
         """Initialize the proxy object."""
         try:
             _LOGGER.debug(
@@ -63,9 +63,6 @@ class OWServerStatelessProxy:
 
         await self.ping()
         await self.init_error_codes()
-
-        version_bytes = await self.read(OWServerCommonPath.VERSION)
-        return version_bytes.decode()
 
     async def _sendmess(
         self,
