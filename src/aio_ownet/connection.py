@@ -6,7 +6,6 @@ import asyncio
 import logging
 import struct
 from dataclasses import dataclass
-from time import monotonic
 from types import TracebackType
 from typing import Self
 
@@ -15,12 +14,14 @@ from .definitions import OWServerMessageType
 from .exceptions import OWServerConnectionError
 from .exceptions import OWServerMalformedHeaderError
 from .exceptions import OWServerShortReadError
-from .exceptions import OWServerTimeoutError
 
 _LOGGER = logging.getLogger(__name__)
 
 # do not attempt to read messages bigger than this (bytes)
 MAX_PAYLOAD = 65536
+
+DEFAULT_CONNECTION_TIMEOUT = 10
+DEFAULT_COMMAND_TIMEOUT = 10
 
 
 @dataclass
@@ -92,17 +93,25 @@ class OWServerConnection:
     _reader: asyncio.StreamReader
     _writer: asyncio.StreamWriter
 
-    def __init__(self, host: str, port: int) -> None:
+    def __init__(
+        self,
+        host: str,
+        port: int,
+        *,
+        connection_timeout: int = DEFAULT_CONNECTION_TIMEOUT,
+    ) -> None:
         """Initialize."""
         self._host = host
         self._port = port
+        self._connection_timeout = connection_timeout
 
     # enter the async context manager
     async def __aenter__(self) -> Self:
         """Open a connection."""
-        self._reader, self._writer = await asyncio.open_connection(
-            self._host, self._port
-        )
+        async with asyncio.timeout(self._connection_timeout):
+            self._reader, self._writer = await asyncio.open_connection(
+                self._host, self._port
+            )
         return self
 
     # exit the async context manager
@@ -190,13 +199,21 @@ class OWServerConnection:
         flags: int,
         size: int = 0,
         offset: int = 0,
-        timeout: int = 0,
+        command_timeout: int = DEFAULT_COMMAND_TIMEOUT,
     ) -> tuple[int, int, bytes]:
         """Send message to server and return response."""
+        async with asyncio.timeout(command_timeout):
+            return await self._request(msgtype, payload, flags, size, offset)
 
-        if timeout < 0:
-            raise ValueError("timeout cannot be negative!")
-
+    async def _request(
+        self,
+        msgtype: OWServerMessageType,
+        payload: bytes,
+        flags: int,
+        size: int = 0,
+        offset: int = 0,
+    ) -> tuple[int, int, bytes]:
+        """Send message to server and return response."""
         tohead = OWServerTxHeader(
             payload=len(payload),
             type=msgtype,
@@ -205,7 +222,6 @@ class OWServerConnection:
             offset=offset,
         )
 
-        tstartcom = monotonic()  # set timer when communication begins
         await self._send_msg(tohead, payload)
 
         while True:
@@ -216,12 +232,3 @@ class OWServerConnection:
                 return fromhead.ret, fromhead.control_flags, data
 
             assert msgtype != OWServerMessageType.NOP
-
-            # we did not exit the loop because payload is negative
-            # Server said PING to keep connection alive during lengthy op
-
-            # check if timeout has expired
-            if timeout:
-                tcom = monotonic() - tstartcom
-                if tcom > timeout:
-                    raise OWServerTimeoutError(tcom, timeout)

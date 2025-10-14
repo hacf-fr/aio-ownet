@@ -6,6 +6,8 @@ import asyncio
 import contextlib
 import logging
 
+from .connection import DEFAULT_COMMAND_TIMEOUT
+from .connection import DEFAULT_CONNECTION_TIMEOUT
 from .connection import MAX_PAYLOAD
 from .connection import OWServerConnection
 from .definitions import OWServerCommonPath
@@ -23,10 +25,17 @@ _LOGGER = logging.getLogger(__name__)
 class OWServerStatelessProxy:
     """A stateless proxy object for an owserver."""
 
-    def __init__(self, host: str, port: int) -> None:
+    def __init__(
+        self,
+        host: str,
+        port: int,
+        *,
+        connection_timeout: int = DEFAULT_CONNECTION_TIMEOUT,
+    ) -> None:
         """Initialize the proxy object."""
         self._host = host
         self._port = port
+        self._connection_timeout = connection_timeout
         self._flags = 0
         self._return_code_messages: tuple[str, ...] = ()
 
@@ -39,13 +48,14 @@ class OWServerStatelessProxy:
 
     async def validate(self) -> None:
         """Initialize the proxy object."""
+        _LOGGER.debug(
+            "Connecting (async) to %s on port %s", self._host, self._port
+        )
         try:
-            _LOGGER.debug(
-                "Connecting (async) to %s on port %s", self._host, self._port
-            )
-            reader, writer = await asyncio.open_connection(
-                self._host, self._port
-            )
+            async with asyncio.timeout(self._connection_timeout):
+                reader, writer = await asyncio.open_connection(
+                    self._host, self._port
+                )
         except OSError as err:
             _LOGGER.exception(
                 "Failed to connect to %s on port %s", self._host, self._port
@@ -71,16 +81,23 @@ class OWServerStatelessProxy:
         flags: int = 0,
         size: int = 0,
         offset: int = 0,
-        timeout: int = 0,
+        command_timeout: int = DEFAULT_COMMAND_TIMEOUT,
     ) -> tuple[int, bytes]:
         """Send generic message and returns retcode, data."""
 
         flags |= self._flags
         assert not (flags & OWServerControlFlag.PERSISTENCE)
 
-        async with OWServerConnection(self._host, self._port) as conn:
+        async with OWServerConnection(
+            self._host, self._port, connection_timeout=self._connection_timeout
+        ) as conn:
             ret, _, data = await conn.request(
-                msgtype, payload, flags, size, offset, timeout
+                msgtype,
+                payload,
+                flags,
+                size,
+                offset,
+                command_timeout,
             )
 
         return ret, data
@@ -107,7 +124,7 @@ class OWServerStatelessProxy:
         path: str,
         size: int = MAX_PAYLOAD,
         offset: int = 0,
-        timeout: int = 0,
+        command_timeout: int = DEFAULT_COMMAND_TIMEOUT,
     ) -> bytes:
         """Read data at path."""
 
@@ -119,7 +136,7 @@ class OWServerStatelessProxy:
             str2byteszero(path),
             size=size,
             offset=offset,
-            timeout=timeout,
+            command_timeout=command_timeout,
         )
         if ret < 0:
             raise OWServerReturnError(
@@ -132,7 +149,7 @@ class OWServerStatelessProxy:
         path: str = "/",
         slash: bool = True,
         bus: bool = False,
-        timeout: int = 0,
+        command_timeout: int = DEFAULT_COMMAND_TIMEOUT,
     ) -> list[str]:
         """List entities at path."""
 
@@ -146,7 +163,10 @@ class OWServerStatelessProxy:
             flags = self._flags & ~OWServerControlFlag.BUS_RET
 
         ret, data = await self._sendmess(
-            msg, str2byteszero(path), flags, timeout=timeout
+            msg,
+            str2byteszero(path),
+            flags,
+            command_timeout=command_timeout,
         )
         if ret < 0:
             raise OWServerReturnError(
@@ -157,7 +177,11 @@ class OWServerStatelessProxy:
         return []
 
     async def write(
-        self, path: str, data: bytes, offset: int = 0, timeout: int = 0
+        self,
+        path: str,
+        data: bytes,
+        offset: int = 0,
+        command_timeout: int = DEFAULT_COMMAND_TIMEOUT,
     ) -> None:
         """Write data at path."""
 
@@ -169,7 +193,7 @@ class OWServerStatelessProxy:
             str2byteszero(path) + data,
             size=len(data),
             offset=offset,
-            timeout=timeout,
+            command_timeout=command_timeout,
         )
         assert not rdata, (ret, rdata)
         if ret < 0:
