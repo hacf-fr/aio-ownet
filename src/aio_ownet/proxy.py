@@ -102,11 +102,6 @@ class OWServerStatelessProxy:
         if ret < 0:
             raise OWServerReturnError(-ret, self._get_return_code_message(-ret))
 
-    async def read_string(self, path: str) -> str:
-        """Read data at path."""
-        result_bytes = await self.read(path)
-        return result_bytes.decode()
-
     async def read(
         self,
         path: str,
