@@ -20,8 +20,8 @@ _LOGGER = logging.getLogger(__name__)
 # do not attempt to read messages bigger than this (bytes)
 MAX_PAYLOAD = 65536
 
-DEFAULT_CONNECTION_TIMEOUT = 10
-DEFAULT_COMMAND_TIMEOUT = 10
+DEFAULT_CONNECTION_TIMEOUT = 60
+DEFAULT_COMMAND_TIMEOUT = 60
 
 
 @dataclass
