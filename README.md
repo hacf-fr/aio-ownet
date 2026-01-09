@@ -1,7 +1,6 @@
 # Async OWFS (owserver) client
 
 [![PyPI](https://img.shields.io/pypi/v/aio-ownet.svg)][pypi_]
-[![Status](https://img.shields.io/pypi/status/aio-ownet.svg)][status]
 [![Python Version](https://img.shields.io/pypi/pyversions/aio-ownet)][python version]
 [![License](https://img.shields.io/pypi/l/aio-ownet)][license]
 
@@ -10,16 +9,15 @@
 [![Codecov](https://codecov.io/gh/hacf-fr/aio-ownet/branch/main/graph/badge.svg)][codecov]
 
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)][pre-commit]
-[![Black](https://img.shields.io/badge/code%20style-black-000000.svg)][black]
+[![ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)][ruff]
 
 [pypi_]: https://pypi.org/project/aio-ownet/
-[status]: https://pypi.org/project/aio-ownet/
 [python version]: https://pypi.org/project/aio-ownet
 [read the docs]: https://aio-ownet.readthedocs.io/
 [tests]: https://github.com/hacf-fr/aio-ownet/actions?workflow=Tests
 [codecov]: https://app.codecov.io/gh/hacf-fr/aio-ownet
 [pre-commit]: https://github.com/pre-commit/pre-commit
-[black]: https://github.com/psf/black
+[ruff]: https://github.com/astral-sh/ruff
 
 ## Features
 
