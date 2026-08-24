@@ -96,6 +96,7 @@ ignore = [
     "PLR2004", # Magic value used in comparison, consider replacing
     "PLR0911", # Too many return statements
     "PLR0913", # Too many arguments in function definition
+    "PLR0917", # Too many positional arguments
     "PT001",   # Use `@pytest.fixture()` over `@pytest.fixture`
     "PT018",   # Assertion should be broken down into multiple parts
     "PT022",   # No teardown in fixture `cli_runner`, use `return` instead of `yield`
