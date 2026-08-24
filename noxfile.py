@@ -25,14 +25,14 @@ except ImportError:
 package = "aio_ownet"
 python_versions = ["3.14", "3.13", "3.12", "3.11"]
 nox.needs_version = ">= 2021.6.6"
-nox.options.sessions = (
+nox.options.sessions = [
     "pre-commit",
     "safety",
     "mypy",
     "tests",
     "typeguard",
     "docs-build",
-)
+]
 
 
 def activate_virtualenv_in_precommit_hooks(session: Session) -> None:
