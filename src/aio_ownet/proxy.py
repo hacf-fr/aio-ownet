@@ -48,28 +48,20 @@ class OWServerStatelessProxy:
 
     async def validate(self) -> None:
         """Initialize the proxy object."""
-        _LOGGER.debug(
-            "Connecting (async) to %s on port %s", self._host, self._port
-        )
+        _LOGGER.debug("Connecting (async) to %s on port %s", self._host, self._port)
         try:
             async with asyncio.timeout(self._connection_timeout):
-                reader, writer = await asyncio.open_connection(
-                    self._host, self._port
-                )
+                reader, writer = await asyncio.open_connection(self._host, self._port)
         except OSError as err:
             _LOGGER.exception(
                 "Failed to connect to %s on port %s", self._host, self._port
             )
             raise OWServerConnectionError from err
 
-        _LOGGER.info(
-            "Validated connection to %s on port %s", self._host, self._port
-        )
+        _LOGGER.info("Validated connection to %s on port %s", self._host, self._port)
         writer.close()
         await writer.wait_closed()
-        _LOGGER.debug(
-            "Closed connection to %s on port %s", self._host, self._port
-        )
+        _LOGGER.debug("Closed connection to %s on port %s", self._host, self._port)
 
         await self.ping()
         await self.init_error_codes()
@@ -107,9 +99,7 @@ class OWServerStatelessProxy:
         """Fetch error codes array from owserver."""
         with contextlib.suppress(OWServerReturnError):
             return_codes = await self.read(OWServerCommonPath.RETURN_CODES)
-            self._return_code_messages = tuple(
-                bytes2str(return_codes).split(",")
-            )
+            self._return_code_messages = tuple(bytes2str(return_codes).split(","))
 
     async def ping(self) -> None:
         """Send a NOP packet and wait for response."""
@@ -140,9 +130,7 @@ class OWServerStatelessProxy:
             command_timeout=command_timeout,
         )
         if ret < 0:
-            raise OWServerReturnError(
-                -ret, self._get_return_code_message(-ret), path
-            )
+            raise OWServerReturnError(-ret, self._get_return_code_message(-ret), path)
         return data
 
     async def dir(
@@ -170,9 +158,7 @@ class OWServerStatelessProxy:
             command_timeout=command_timeout,
         )
         if ret < 0:
-            raise OWServerReturnError(
-                -ret, self._get_return_code_message(-ret), path
-            )
+            raise OWServerReturnError(-ret, self._get_return_code_message(-ret), path)
         if data:
             return bytes2str(data).split(",")
         return []
@@ -199,6 +185,4 @@ class OWServerStatelessProxy:
         if rdata:
             raise OWServerProtocolError("invalid reply to write message")
         if ret < 0:
-            raise OWServerReturnError(
-                -ret, self._get_return_code_message(-ret), path
-            )
+            raise OWServerReturnError(-ret, self._get_return_code_message(-ret), path)

@@ -93,9 +93,7 @@ def _check_rx_header(header: OWServerRxHeader) -> None:
     if header.version != 0:
         raise OWServerMalformedHeaderError("bad version", header)
     if header.payload > MAX_PAYLOAD:
-        raise OWServerMalformedHeaderError(
-            "huge payload, unwilling to read", header
-        )
+        raise OWServerMalformedHeaderError("huge payload, unwilling to read", header)
     if header.payload > 0 and header.size > header.payload:
         raise OWServerMalformedHeaderError("size larger than payload", header)
 
@@ -214,9 +212,7 @@ class OWServerConnection:
         """Send message to server and return response."""
         try:
             async with asyncio.timeout(command_timeout):
-                return await self._request(
-                    msgtype, payload, flags, size, offset
-                )
+                return await self._request(msgtype, payload, flags, size, offset)
         except TimeoutError as err:
             raise OWServerConnectionError from err
 
@@ -247,6 +243,4 @@ class OWServerConnection:
                 return fromhead.ret, fromhead.control_flags, data
 
             if msgtype == OWServerMessageType.NOP:
-                raise OWServerProtocolError(
-                    "unexpected keepalive in reply to ping"
-                )
+                raise OWServerProtocolError("unexpected keepalive in reply to ping")
