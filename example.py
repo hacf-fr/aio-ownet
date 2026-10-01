@@ -1,4 +1,4 @@
-"""Sample interation with Async OWFS (owserver) client."""
+"""Sample interaction with Async OWFS (owserver) client."""
 
 from __future__ import annotations
 
