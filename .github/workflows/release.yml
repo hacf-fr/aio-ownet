@@ -19,14 +19,14 @@ jobs:
       contents: write
     steps:
       - name: Check out the repository
-        uses: actions/checkout@v7.0.1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 2
           # Credentials are kept so the detect-and-tag step can push the tag
           persist-credentials: true
 
       - name: Set up Python
-        uses: actions/setup-python@v7.0.0
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.14.8"
 
@@ -48,7 +48,7 @@ jobs:
       - name: Detect and tag new version
         id: check-version
         if: steps.check-parent-commit.outputs.sha
-        uses: salsify/action-detect-and-tag-new-version@v2.0.3
+        uses: salsify/action-detect-and-tag-new-version@b1778166f13188a9d478e2d1198f993011ba9864 # v2.0.3
         with:
           version-command: |
             bash -o pipefail -c "poetry version | awk '{ print \$2 }'"
@@ -66,16 +66,16 @@ jobs:
 
       - name: Publish package on PyPI
         if: steps.check-version.outputs.tag
-        uses: pypa/gh-action-pypi-publish@v1.14.2
+        uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
 
       - name: Publish package on TestPyPI
         if: "! steps.check-version.outputs.tag"
-        uses: pypa/gh-action-pypi-publish@v1.14.2
+        uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
         with:
           repository-url: https://test.pypi.org/legacy/
 
       - name: Publish release notes
-        uses: release-drafter/release-drafter@v7.7.0
+        uses: release-drafter/release-drafter@34d80673e067bdc0c24568d3af899c216adcfaa9 # v7.7.0
         with:
           publish: ${{ steps.check-version.outputs.tag != '' }}
           tag: ${{ steps.check-version.outputs.tag }}
