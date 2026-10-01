@@ -19,6 +19,3 @@ __pycache__/
 
 # Node
 node_modules/
-
-# Claude Code agent worktrees
-/.claude/worktrees/

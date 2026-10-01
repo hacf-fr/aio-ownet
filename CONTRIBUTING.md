@@ -39,45 +39,50 @@ Request features on the [Issue Tracker].
 
 You need Python 3.11+ and the following tools:
 
-- [Poetry]
-- [Nox]
-- [nox-poetry]
+- [uv]
+- [Node.js] (version in `.nvmrc`), for [Prettier]
 
 Install the package with development requirements:
 
 ```console
-$ poetry install
+$ uv sync
+$ npm ci
 ```
 
 You can now run an interactive Python session:
 
 ```console
-$ poetry run python
+$ uv run python
 ```
 
-[poetry]: https://python-poetry.org/
-[nox]: https://nox.thea.codes/
-[nox-poetry]: https://nox-poetry.readthedocs.io/
+[uv]: https://docs.astral.sh/uv/
+[node.js]: https://nodejs.org/
+[prettier]: https://prettier.io/
 
 ## How to test the project
 
-Run the full test suite:
+Run the test suite:
 
 ```console
-$ nox
+$ uv run pytest
 ```
 
-List the available Nox sessions:
+Run the type checker:
 
 ```console
-$ nox --list-sessions
+$ uv run ty check src tests docs/conf.py
 ```
 
-You can also run a specific Nox session.
-For example, invoke the unit test suite like this:
+Run the linters and formatters:
 
 ```console
-$ nox --session=tests
+$ uv run prek run --all-files
+```
+
+Build the documentation (Python 3.14+ only):
+
+```console
+$ uv run sphinx-build docs docs/_build
 ```
 
 Unit tests are located in the _tests_ directory,
@@ -91,17 +96,19 @@ Open a [pull request] to submit changes to this project.
 
 Your pull request needs to meet the following guidelines for acceptance:
 
-- The Nox test suite must pass without errors and warnings.
+- The test suite, type checks and linters must pass without errors and warnings.
 - Include unit tests. This project maintains 100% code coverage.
 - If your changes add functionality, update the documentation accordingly.
 
 Feel free to submit early, though—we can always iterate on this.
 
-To run linting and code formatting checks before committing your change, you can install pre-commit as a Git hook by running the following command:
+To run linting and code formatting checks before committing your change, you can install [prek] as a Git hook by running the following command:
 
 ```console
-$ nox --session=pre-commit -- install
+$ uv run prek install
 ```
+
+[prek]: https://prek.j178.dev/
 
 It is recommended to open an issue before starting work on anything.
 This will allow a chance to talk it over with the owners and validate your approach.

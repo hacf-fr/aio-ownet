@@ -6,15 +6,16 @@ owserver network protocol to read, write and list 1-Wire devices.
 ## Commands
 
 ```console
-poetry install                             # install (dev dependencies included)
-poetry run pytest                          # tests
-poetry run mypy src tests docs/conf.py     # type checking
-poetry run pre-commit run --all-files      # ruff, prettier, ...
-nox                                        # all CI sessions
-nox --session=tests                        # one session (see nox --list-sessions)
+uv sync                                    # install (dev + docs groups by default)
+npm ci                                     # install prettier (Node version in .nvmrc)
+uv run pytest                              # tests
+uv run ty check src tests docs/conf.py     # type checking
+uv run prek run --all-files                # ruff, prettier, codespell, yamllint, ...
+uv run sphinx-build docs docs/_build       # docs (Python 3.14+ only)
 ```
 
-CI runs the nox sessions; keep `poetry.lock` in sync with `pyproject.toml`.
+CI runs the same commands with `--locked`; keep `uv.lock` in sync with
+`pyproject.toml`.
 
 ## Layout
 
@@ -33,7 +34,6 @@ CI runs the nox sessions; keep `poetry.lock` in sync with `pyproject.toml`.
 
 - Python 3.11+ (`target-version = "py311"`); don't use newer syntax.
 - Ruff with `force-single-line` imports and Google-style docstrings.
-- mypy in strict mode.
 - Add tests with every change.
 
 ## AI policy
