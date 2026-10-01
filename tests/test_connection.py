@@ -194,17 +194,19 @@ async def test_request_timeout(owserver: FakeOWServer) -> None:
     """Test the command timeout when the server does not answer"""
     owserver.handler = owserver.stall
     async with OWServerConnection("127.0.0.1", owserver.port) as conn:
-        with pytest.raises(TimeoutError):
+        with pytest.raises(OWServerConnectionError) as exc_info:
             await conn.request(
                 OWServerMessageType.READ, b"/x\x00", 0, command_timeout=0
             )
+    assert isinstance(exc_info.value.__cause__, TimeoutError)
 
 
 async def test_connection_refused(unused_port: int) -> None:
-    """Test connecting to a closed port raises the raw OSError"""
-    with pytest.raises(ConnectionRefusedError):
+    """Test connecting to a closed port"""
+    with pytest.raises(OWServerConnectionError) as exc_info:
         async with OWServerConnection("127.0.0.1", unused_port):
             pass
+    assert isinstance(exc_info.value.__cause__, ConnectionRefusedError)
 
 
 async def test_connection_timeout() -> None:
@@ -214,9 +216,13 @@ async def test_connection_timeout() -> None:
         await asyncio.Event().wait()
         raise AssertionError
 
-    with patch("asyncio.open_connection", _hang), pytest.raises(TimeoutError):
+    with (
+        patch("asyncio.open_connection", _hang),
+        pytest.raises(OWServerConnectionError) as exc_info,
+    ):
         async with OWServerConnection("127.0.0.1", 4304, connection_timeout=0):
             pass
+    assert isinstance(exc_info.value.__cause__, TimeoutError)
 
 
 def _mock_connection(

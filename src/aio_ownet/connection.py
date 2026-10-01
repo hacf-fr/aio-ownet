@@ -121,10 +121,14 @@ class OWServerConnection:
     # enter the async context manager
     async def __aenter__(self) -> Self:
         """Open a connection."""
-        async with asyncio.timeout(self._connection_timeout):
-            self._reader, self._writer = await asyncio.open_connection(
-                self._host, self._port
-            )
+        try:
+            async with asyncio.timeout(self._connection_timeout):
+                self._reader, self._writer = await asyncio.open_connection(
+                    self._host, self._port
+                )
+        except OSError as err:
+            # includes TimeoutError
+            raise OWServerConnectionError from err
         return self
 
     # exit the async context manager
@@ -208,8 +212,13 @@ class OWServerConnection:
         command_timeout: int = DEFAULT_COMMAND_TIMEOUT,
     ) -> tuple[int, int, bytes]:
         """Send message to server and return response."""
-        async with asyncio.timeout(command_timeout):
-            return await self._request(msgtype, payload, flags, size, offset)
+        try:
+            async with asyncio.timeout(command_timeout):
+                return await self._request(
+                    msgtype, payload, flags, size, offset
+                )
+        except TimeoutError as err:
+            raise OWServerConnectionError from err
 
     async def _request(
         self,
