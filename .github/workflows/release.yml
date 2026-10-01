@@ -2,9 +2,9 @@ name: Release
 
 # yamllint disable-line rule:truthy
 on:
-  push:
-    branches:
-      - main
+  release:
+    types:
+      - published
 
 permissions:
   contents: read
@@ -14,20 +14,21 @@ env:
 
 jobs:
   release:
-    name: Release
+    name: Release to PyPI
     runs-on: ubuntu-latest
+    environment:
+      name: release
+      url: https://pypi.org/p/aio-ownet
     permissions:
+      # Needed to attest the SBOM against the built artifacts
+      attestations: write
       # IMPORTANT: this permission is mandatory for Trusted Publishing
       id-token: write
-      # Needed for salsify/action-detect-and-tag-new-version
-      contents: write
     steps:
       - name: Check out the repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          fetch-depth: 2
-          # Credentials are kept so the detect-and-tag step can push the tag
-          persist-credentials: true # zizmor: ignore[artipacked]
+          persist-credentials: false
 
       - name: Set up uv and Python
         uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
@@ -37,42 +38,40 @@ jobs:
           # No cache on release builds, to avoid cache poisoning
           enable-cache: false
 
-      - name: Check if there is a parent commit
-        id: check-parent-commit
+      - name: Set package version
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
         run: |
-          echo "sha=$(git rev-parse --verify --quiet HEAD^)" >> "${GITHUB_OUTPUT}"
-
-      - name: Detect and tag new version
-        id: check-version
-        if: steps.check-parent-commit.outputs.sha
-        uses: salsify/action-detect-and-tag-new-version@b1778166f13188a9d478e2d1198f993011ba9864 # v2.0.3
-        with:
-          # --no-sync reads pyproject.toml (--frozen would read uv.lock)
-          version-command: |
-            uv version --short --no-sync
-
-      - name: Bump version for developmental release
-        if: "! steps.check-version.outputs.tag"
-        run: |
-          uv version --bump patch --bump "dev=$(date +%s)" --frozen
+          version="${RELEASE_TAG,,}"
+          version="${version#v}"
+          uv version "${version}" --frozen
 
       - name: Build package
         run: |
           uv build
 
+      - name: Locate built wheel
+        run: |
+          WHEEL_PATH=$(ls dist/aio_ownet-*-py3-none-any.whl)
+          echo "WHEEL_PATH=${WHEEL_PATH}" >> "${GITHUB_ENV}"
+
+      - name: Generate CycloneDX SBOM
+        uses: anchore/sbom-action@3ad7283483fc7af8ff2b4ea19663c2d5ca935e26 # v0.24.2
+        with:
+          file: ${{ env.WHEEL_PATH }}
+          format: cyclonedx-json
+          output-file: aio-ownet.cdx.json
+          upload-artifact: false
+          upload-release-assets: false
+
+      - name: Attest SBOM against built artifacts
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
+        with:
+          subject-path: "dist/*"
+          sbom-path: aio-ownet.cdx.json
+
       - name: Publish package on PyPI
-        if: steps.check-version.outputs.tag
-        uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
-
-      - name: Publish package on TestPyPI
-        if: "! steps.check-version.outputs.tag"
         uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
         with:
-          repository-url: https://test.pypi.org/legacy/
-
-      - name: Publish release notes
-        uses: release-drafter/release-drafter@34d80673e067bdc0c24568d3af899c216adcfaa9 # v7.7.0
-        with:
-          publish: ${{ steps.check-version.outputs.tag != '' }}
-          tag: ${{ steps.check-version.outputs.tag }}
-          token: ${{ secrets.GITHUB_TOKEN }}
+          verbose: true
+          print-hash: true
