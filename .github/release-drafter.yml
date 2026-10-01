@@ -1,3 +1,11 @@
+name-template: "v$RESOLVED_VERSION"
+tag-template: "v$RESOLVED_VERSION"
+version-resolver:
+  minor:
+    labels:
+      - "breaking"
+      - "enhancement"
+  default: patch
 categories:
   - title: ":boom: Breaking Changes"
     label: "breaking"

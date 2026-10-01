@@ -1,6 +1,6 @@
 [project]
 name = "aio-ownet"
-version = "0.0.5"
+version = "0.0.0"
 description = "Async OWFS (owserver) client"
 authors = [{ name = "epenet" }, { name = "HACF", email = "contact@hacf.fr" }]
 license = "MIT"
