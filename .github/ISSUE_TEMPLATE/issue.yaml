@@ -1,0 +1,68 @@
+name: Issue
+description: Report an issue with the aio-ownet library.
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report an issue!
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: >-
+        A clear description of what the issue is. What did you do, what
+        did you expect to see, and what did you see instead?
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: aio-ownet version
+      description: The version of aio-ownet you are using (`pip show aio-ownet`).
+      placeholder: e.g., 0.0.5
+    validations:
+      required: true
+  - type: input
+    id: python-version
+    attributes:
+      label: Python version and operating system
+      placeholder: e.g., Python 3.13 on Ubuntu 24.04
+    validations:
+      required: true
+  - type: input
+    id: owserver
+    attributes:
+      label: owserver version and devices
+      description: >-
+        The OWFS / owserver version, and the 1-Wire device families involved
+        (e.g. `28` for DS18B20).
+      placeholder: e.g., owserver 3.2p4, DS18B20 (28) and DS2438 (26)
+    validations:
+      required: false
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Code to reproduce
+      description: A minimal Python snippet that reproduces the issue.
+      render: python
+    validations:
+      required: false
+  - type: textarea
+    id: logs
+    attributes:
+      label: Debug logs
+      description: >-
+        Relevant debug output, for example with
+        `logging.basicConfig(level=logging.DEBUG)`.
+      render: text
+    validations:
+      required: false
+  - type: textarea
+    id: additional-information
+    attributes:
+      label: Additional information
+      description: Any additional context that might help.
+    validations:
+      required: false
