@@ -279,12 +279,6 @@ async def test_dir(
     assert owserver.requests[0].data == b"/\x00"
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="proxy.py:177 clears BUS_RET but _sendmess (proxy.py:102) ORs "
-    "self._flags back in, so bus=False cannot clear a proxy-level BUS_RET "
-    "(latent: _flags is always 0 today)",
-)
 async def test_dir_clears_bus_flag(
     owserver: FakeOWServer, proxy: OWServerStatelessProxy
 ) -> None:
@@ -333,6 +327,21 @@ async def test_write_not_bytes(proxy: OWServerStatelessProxy) -> None:
     """Test writing non-binary data is refused"""
     with pytest.raises(TypeError, match="'data' argument must be binary"):
         await proxy.write(TEMPERATURE, "42")  # type: ignore[arg-type]  # ty: ignore[invalid-argument-type]
+
+
+async def test_write_invalid_reply(
+    owserver: FakeOWServer, proxy: OWServerStatelessProxy
+) -> None:
+    """Test a write reply carrying data"""
+
+    async def _handler(_request: Request) -> bytes:
+        return make_response(0, b"x")
+
+    owserver.handler = _handler
+    with pytest.raises(
+        OWServerProtocolError, match="invalid reply to write message"
+    ):
+        await proxy.write(TEMPERATURE, b"42")
 
 
 async def test_write_error(proxy: OWServerStatelessProxy) -> None:

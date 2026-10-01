@@ -78,14 +78,15 @@ class OWServerStatelessProxy:
         self,
         msgtype: OWServerMessageType,
         payload: bytes,
-        flags: int = 0,
+        flags: int | None = None,
         size: int = 0,
         offset: int = 0,
         command_timeout: int = DEFAULT_COMMAND_TIMEOUT,
     ) -> tuple[int, bytes]:
         """Send generic message and returns retcode, data."""
 
-        flags |= self._flags
+        if flags is None:
+            flags = self._flags
         assert not (flags & OWServerControlFlag.PERSISTENCE)
 
         async with OWServerConnection(
@@ -195,7 +196,8 @@ class OWServerStatelessProxy:
             offset=offset,
             command_timeout=command_timeout,
         )
-        assert not rdata, (ret, rdata)
+        if rdata:
+            raise OWServerProtocolError("invalid reply to write message")
         if ret < 0:
             raise OWServerReturnError(
                 -ret, self._get_return_code_message(-ret), path

@@ -138,6 +138,16 @@ async def test_request_skips_keepalive(owserver: FakeOWServer) -> None:
     assert await _request(owserver) == (3, OWServerControlFlag.OWNET, b"data")
 
 
+async def test_request_keepalive_reply_to_nop(owserver: FakeOWServer) -> None:
+    """Test a keepalive frame in reply to a NOP message"""
+    keepalive = make_response(0, payload=-1, size=0)
+    owserver.handler = _const(keepalive + make_response(0))
+    with pytest.raises(
+        OWServerProtocolError, match="unexpected keepalive in reply to ping"
+    ):
+        await _request(owserver, OWServerMessageType.NOP, b"")
+
+
 async def test_request_bad_version(owserver: FakeOWServer) -> None:
     """Test a response with a non-zero version"""
     owserver.handler = _const(make_response(0, version=1))
@@ -286,17 +296,12 @@ async def test_aexit_closes_writer() -> None:
     writer.wait_closed.assert_awaited_once_with()
 
 
-@pytest.mark.xfail(
-    strict=True,
-    raises=AssertionError,
-    reason="connection.py:178 uses assert to validate size <= payload, "
-    "so a malformed server header raises AssertionError (or is silently "
-    "accepted under python -O) instead of an OWServerProtocolError",
-)
 async def test_payload_size_larger_than_payload(
     owserver: FakeOWServer,
 ) -> None:
     """Test a header whose size field exceeds the payload length"""
     owserver.handler = _const(make_response(0, b"abc", size=10))
-    with pytest.raises(OWServerProtocolError):
+    with pytest.raises(
+        OWServerMalformedHeaderError, match="size larger than payload"
+    ):
         await _request(owserver)
