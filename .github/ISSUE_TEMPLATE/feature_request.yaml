@@ -1,0 +1,28 @@
+name: Feature request
+description: Suggest a new feature or an improvement to the library.
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting an improvement!
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: >-
+        Describe what you'd like to see. If a device or owserver feature
+        behaves incorrectly, explain what it currently does and what you
+        expect it to do instead.
+    validations:
+      required: true
+  - type: textarea
+    id: additional-information
+    attributes:
+      label: Additional information
+      description: >-
+        Any additional context, references, or links (e.g. the relevant part
+        of the owserver protocol documentation).
+    validations:
+      required: false
