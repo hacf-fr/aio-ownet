@@ -37,7 +37,7 @@ $ pip install aio-ownet
 
 ## Usage
 
-Please see the [Command-line Reference] for details.
+Please see the [Usage] page for details.
 
 ## Contributing
 
@@ -68,4 +68,4 @@ This project was generated from [@cjolowicz]'s [Hypermodern Python Cookiecutter]
 
 [license]: https://github.com/hacf-fr/aio-ownet/blob/main/LICENSE
 [contributor guide]: https://github.com/hacf-fr/aio-ownet/blob/main/CONTRIBUTING.md
-[command-line reference]: https://aio-ownet.readthedocs.io/en/latest/usage.html
+[usage]: https://aio-ownet.readthedocs.io/en/latest/usage.html
