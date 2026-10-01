@@ -332,7 +332,7 @@ async def test_write(
 async def test_write_not_bytes(proxy: OWServerStatelessProxy) -> None:
     """Test writing non-binary data is refused"""
     with pytest.raises(TypeError, match="'data' argument must be binary"):
-        await proxy.write(TEMPERATURE, "42")  # type: ignore[arg-type]  # ty: ignore[invalid-argument-type]
+        await proxy.write(TEMPERATURE, "42")  # ty: ignore[invalid-argument-type]
 
 
 async def test_write_error(proxy: OWServerStatelessProxy) -> None:
