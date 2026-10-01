@@ -226,15 +226,17 @@ async def test_read_timeout(
 ) -> None:
     """Test the command timeout"""
     owserver.handler = owserver.stall
-    with pytest.raises(TimeoutError):
+    with pytest.raises(OWServerConnectionError) as exc_info:
         await proxy.read(TEMPERATURE, command_timeout=0)
+    assert isinstance(exc_info.value.__cause__, TimeoutError)
 
 
 async def test_read_connection_refused(unused_port: int) -> None:
-    """Test connection errors outside validate are not wrapped"""
+    """Test connection errors outside validate are wrapped"""
     proxy = OWServerStatelessProxy("127.0.0.1", unused_port)
-    with pytest.raises(ConnectionRefusedError):
+    with pytest.raises(OWServerConnectionError) as exc_info:
         await proxy.read(TEMPERATURE)
+    assert isinstance(exc_info.value.__cause__, ConnectionRefusedError)
 
 
 @pytest.mark.parametrize(
