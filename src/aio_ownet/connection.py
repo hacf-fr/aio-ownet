@@ -13,6 +13,7 @@ from .definitions import OWServerControlFlag
 from .definitions import OWServerMessageType
 from .exceptions import OWServerConnectionError
 from .exceptions import OWServerMalformedHeaderError
+from .exceptions import OWServerProtocolError
 from .exceptions import OWServerShortReadError
 
 _LOGGER = logging.getLogger(__name__)
@@ -85,6 +86,18 @@ class OWServerRxHeader:
             size=unpack[4],
             offset=unpack[5],
         )
+
+
+def _check_rx_header(header: OWServerRxHeader) -> None:
+    """Raise if the header received from the server is malformed."""
+    if header.version != 0:
+        raise OWServerMalformedHeaderError("bad version", header)
+    if header.payload > MAX_PAYLOAD:
+        raise OWServerMalformedHeaderError(
+            "huge payload, unwilling to read", header
+        )
+    if header.payload > 0 and header.size > header.payload:
+        raise OWServerMalformedHeaderError("size larger than payload", header)
 
 
 class OWServerConnection:
@@ -164,18 +177,11 @@ class OWServerConnection:
         header = OWServerRxHeader.from_packed(data)
         _LOGGER.debug("<- %s", header)
 
-        # error conditions
-        if header.version != 0:
-            raise OWServerMalformedHeaderError("bad version", header)
-        if header.payload > MAX_PAYLOAD:
-            raise OWServerMalformedHeaderError(
-                "huge payload, unwilling to read", header
-            )
+        _check_rx_header(header)
 
         if header.payload > 0:
             payload = await _recv_socket(header.payload)
             _LOGGER.debug("<-.. %s %s", header, payload)
-            assert header.size <= header.payload
             payload = payload[: header.size]
         else:
             payload = b""
@@ -231,4 +237,7 @@ class OWServerConnection:
                 # we received a valid answer and return the result
                 return fromhead.ret, fromhead.control_flags, data
 
-            assert msgtype != OWServerMessageType.NOP
+            if msgtype == OWServerMessageType.NOP:
+                raise OWServerProtocolError(
+                    "unexpected keepalive in reply to ping"
+                )
