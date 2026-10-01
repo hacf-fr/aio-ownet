@@ -4,13 +4,33 @@ on:
   push:
     branches:
       - main
+    paths:
+      - .github/labels.yml
+      - .github/workflows/labeler.yml
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
 
 jobs:
   labeler:
+    name: Sync labels
+    if: github.repository_owner == 'hacf-fr'
     runs-on: ubuntu-latest
+    permissions:
+      # Needed to read .github/labels.yml
+      contents: read
+      # Needed to create and update repository labels
+      issues: write
     steps:
       - name: Check out the repository
         uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Run Labeler
         uses: crazy-max/ghaction-github-labeler@v6.0.0
