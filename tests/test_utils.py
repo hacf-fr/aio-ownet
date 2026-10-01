@@ -29,10 +29,10 @@ def test_str2byteszero(input_string: str, expected_bytes: bytes) -> None:
 def test_bytes2str_type_error() -> None:
     """Test bytes2str with a non-bytes argument"""
     with pytest.raises(TypeError):
-        bytes2str("12")  # type: ignore[arg-type]  # ty: ignore[invalid-argument-type]
+        bytes2str("12")  # ty: ignore[invalid-argument-type]
 
 
 def test_str2byteszero_type_error() -> None:
     """Test str2byteszero with a non-str argument"""
     with pytest.raises(TypeError):
-        str2byteszero(b"/12.8CF1A0000000/family")  # type: ignore[arg-type]  # ty: ignore[invalid-argument-type]
+        str2byteszero(b"/12.8CF1A0000000/family")  # ty: ignore[invalid-argument-type]
