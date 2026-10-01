@@ -1,5 +1,6 @@
 name: Release
 
+# yamllint disable-line rule:truthy
 on:
   push:
     branches:
@@ -7,6 +8,9 @@ on:
 
 permissions:
   contents: read
+
+env:
+  DEFAULT_PYTHON: "3.14"
 
 jobs:
   release:
@@ -19,63 +23,55 @@ jobs:
       contents: write
     steps:
       - name: Check out the repository
-        uses: actions/checkout@v7.0.1
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 2
           # Credentials are kept so the detect-and-tag step can push the tag
-          persist-credentials: true
+          persist-credentials: true # zizmor: ignore[artipacked]
 
-      - name: Set up Python
-        uses: actions/setup-python@v7.0.0
+      - name: Set up uv and Python
+        uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
         with:
-          python-version: "3.14.8"
-
-      - name: Upgrade pip
-        run: |
-          pip install --constraint=.github/workflows/constraints.txt pip
-          pip --version
-
-      - name: Install Poetry
-        run: |
-          pip install --constraint=.github/workflows/constraints.txt poetry
-          poetry --version
+          version: "0.12.21"
+          python-version: ${{ env.DEFAULT_PYTHON }}
+          # No cache on release builds, to avoid cache poisoning
+          enable-cache: false
 
       - name: Check if there is a parent commit
         id: check-parent-commit
         run: |
-          echo "sha=$(git rev-parse --verify --quiet HEAD^)" >> $GITHUB_OUTPUT
+          echo "sha=$(git rev-parse --verify --quiet HEAD^)" >> "${GITHUB_OUTPUT}"
 
       - name: Detect and tag new version
         id: check-version
         if: steps.check-parent-commit.outputs.sha
-        uses: salsify/action-detect-and-tag-new-version@v2.0.3
+        uses: salsify/action-detect-and-tag-new-version@b1778166f13188a9d478e2d1198f993011ba9864 # v2.0.3
         with:
+          # --no-sync reads pyproject.toml (--frozen would read uv.lock)
           version-command: |
-            bash -o pipefail -c "poetry version | awk '{ print \$2 }'"
+            uv version --short --no-sync
 
       - name: Bump version for developmental release
         if: "! steps.check-version.outputs.tag"
         run: |
-          poetry version patch &&
-          version=$(poetry version | awk '{ print $2 }') &&
-          poetry version $version.dev.$(date +%s)
+          uv version --bump patch --bump "dev=$(date +%s)" --frozen
 
       - name: Build package
         run: |
-          poetry build --ansi
+          uv build
 
       - name: Publish package on PyPI
         if: steps.check-version.outputs.tag
-        uses: pypa/gh-action-pypi-publish@v1.14.2
+        uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
 
       - name: Publish package on TestPyPI
         if: "! steps.check-version.outputs.tag"
-        uses: pypa/gh-action-pypi-publish@v1.14.2
+        uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
         with:
           repository-url: https://test.pypi.org/legacy/
 
       - name: Publish release notes
-        uses: release-drafter/release-drafter@v7.7.0
+        uses: release-drafter/release-drafter@34d80673e067bdc0c24568d3af899c216adcfaa9 # v7.7.0
         with:
           publish: ${{ steps.check-version.outputs.tag != '' }}
           tag: ${{ steps.check-version.outputs.tag }}

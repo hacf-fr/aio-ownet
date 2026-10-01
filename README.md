@@ -8,7 +8,7 @@
 [![Tests](https://github.com/hacf-fr/aio-ownet/workflows/Tests/badge.svg)][tests]
 [![Codecov](https://codecov.io/gh/hacf-fr/aio-ownet/branch/main/graph/badge.svg)][codecov]
 
-[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)][pre-commit]
+[![prek](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/j178/prek/master/docs/assets/badge-v0.json)][prek]
 [![ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)][ruff]
 
 [pypi_]: https://pypi.org/project/aio-ownet/
@@ -16,7 +16,7 @@
 [read the docs]: https://aio-ownet.readthedocs.io/
 [tests]: https://github.com/hacf-fr/aio-ownet/actions?workflow=Tests
 [codecov]: https://app.codecov.io/gh/hacf-fr/aio-ownet
-[pre-commit]: https://github.com/pre-commit/pre-commit
+[prek]: https://github.com/j178/prek
 [ruff]: https://github.com/astral-sh/ruff
 
 ## Features
