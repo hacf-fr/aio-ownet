@@ -307,7 +307,5 @@ async def test_payload_size_larger_than_payload(
 ) -> None:
     """Test a header whose size field exceeds the payload length"""
     owserver.handler = _const(make_response(0, b"abc", size=10))
-    with pytest.raises(
-        OWServerMalformedHeaderError, match="size larger than payload"
-    ):
+    with pytest.raises(OWServerMalformedHeaderError, match="size larger than payload"):
         await _request(owserver)

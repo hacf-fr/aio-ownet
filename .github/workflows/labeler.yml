@@ -15,6 +15,7 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
+  # Default for all jobs: read-only access to the repository
   contents: read
 
 jobs:
@@ -33,7 +34,7 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Run Labeler
+      - name: Sync labels
         uses: crazy-max/ghaction-github-labeler@548a7c3603594ec17c819e1239f281a3b801ab4d # v6.0.0
         with:
           skip-delete: true

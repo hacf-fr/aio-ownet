@@ -60,9 +60,7 @@ async def test_validate_connection_refused(
     with pytest.raises(OWServerConnectionError) as exc_info:
         await proxy.validate()
     assert isinstance(exc_info.value.__cause__, ConnectionRefusedError)
-    assert f"Failed to connect to 127.0.0.1 on port {unused_port}" in (
-        caplog.text
-    )
+    assert f"Failed to connect to 127.0.0.1 on port {unused_port}" in (caplog.text)
 
 
 async def test_validate_connection_timeout() -> None:
@@ -125,9 +123,7 @@ def test_get_return_code_message(
     assert proxy._get_return_code_message(ret) == expected
 
 
-async def test_ping(
-    owserver: FakeOWServer, proxy: OWServerStatelessProxy
-) -> None:
+async def test_ping(owserver: FakeOWServer, proxy: OWServerStatelessProxy) -> None:
     """Test ping sends a NOP message"""
     await proxy.ping()
     assert owserver.requests == [
@@ -157,9 +153,7 @@ async def test_ping_invalid_reply(
         return response
 
     owserver.handler = _handler
-    with pytest.raises(
-        OWServerProtocolError, match="invalid reply to ping message"
-    ):
+    with pytest.raises(OWServerProtocolError, match="invalid reply to ping message"):
         await proxy.ping()
 
 
@@ -180,9 +174,7 @@ async def test_ping_error(
     assert exc_info.value.path is None
 
 
-async def test_read(
-    owserver: FakeOWServer, proxy: OWServerStatelessProxy
-) -> None:
+async def test_read(owserver: FakeOWServer, proxy: OWServerStatelessProxy) -> None:
     """Test reading a value"""
     assert await proxy.read(TEMPERATURE) == b"     21.5"
     assert owserver.requests == [
@@ -290,9 +282,7 @@ async def test_dir_clears_bus_flag(
     assert owserver.requests[0].control_flags == OWServerControlFlag.UNCACHED
 
 
-async def test_dir_empty(
-    owserver: FakeOWServer, proxy: OWServerStatelessProxy
-) -> None:
+async def test_dir_empty(owserver: FakeOWServer, proxy: OWServerStatelessProxy) -> None:
     """Test listing an empty directory"""
     assert await proxy.dir("/empty") == []
     assert owserver.requests[0].path == "/empty"
@@ -306,9 +296,7 @@ async def test_dir_error(proxy: OWServerStatelessProxy) -> None:
     assert exc_info.value.path == "/missing"
 
 
-async def test_write(
-    owserver: FakeOWServer, proxy: OWServerStatelessProxy
-) -> None:
+async def test_write(owserver: FakeOWServer, proxy: OWServerStatelessProxy) -> None:
     """Test writing a value"""
     await proxy.write(TEMPERATURE, b"42", offset=1)
     assert owserver.requests == [
@@ -340,9 +328,7 @@ async def test_write_invalid_reply(
         return make_response(0, b"x")
 
     owserver.handler = _handler
-    with pytest.raises(
-        OWServerProtocolError, match="invalid reply to write message"
-    ):
+    with pytest.raises(OWServerProtocolError, match="invalid reply to write message"):
         await proxy.write(TEMPERATURE, b"42")
 
 

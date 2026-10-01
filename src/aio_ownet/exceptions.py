@@ -30,9 +30,7 @@ class OWServerMalformedHeaderError(OWServerProtocolError):
 
     def __str__(self) -> str:
         """Return a string representation of the error."""
-        return (
-            f"{self.msg}, got {str(self.header)!r} decoded as {self.header!r}"
-        )
+        return f"{self.msg}, got {str(self.header)!r} decoded as {self.header!r}"
 
 
 class OWServerShortReadError(OWServerProtocolError):
@@ -61,6 +59,4 @@ class OWServerReturnError(OWServerError):
 
     def __str__(self) -> str:
         """Return a string representation of the error."""
-        return (
-            f"Server return error {self.msg} ({self.ret}) on path {self.path}"
-        )
+        return f"Server return error {self.msg} ({self.ret}) on path {self.path}"

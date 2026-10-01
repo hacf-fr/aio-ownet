@@ -33,9 +33,7 @@ def test_malformed_header_error() -> None:
     err = OWServerMalformedHeaderError("bad version", header)
     assert err.msg == "bad version"
     assert err.header is header
-    assert str(err) == (
-        f"bad version, got {str(header)!r} decoded as {header!r}"
-    )
+    assert str(err) == (f"bad version, got {str(header)!r} decoded as {header!r}")
 
 
 def test_short_read_error() -> None:
