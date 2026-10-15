@@ -40,7 +40,7 @@ dev = [
     "ruff==0.17.1",
     "ty==0.0.88",
     "yamllint==1.38.0",
-    "zizmor==1.31.0",
+    "zizmor==1.31.1",
 ]
 # docs (Python >= 3.14)
 docs = [
