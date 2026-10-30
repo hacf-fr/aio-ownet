@@ -37,4 +37,4 @@ jobs:
 
       - name: Type-check using ty
         run: |
-          uv run --locked --no-group docs ty check src tests docs/conf.py
+          uv run --locked ty check src tests

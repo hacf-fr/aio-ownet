@@ -24,7 +24,6 @@ dependencies = []
 [project.urls]
 Homepage = "https://github.com/hacf-fr/aio-ownet"
 Repository = "https://github.com/hacf-fr/aio-ownet"
-Documentation = "https://aio-ownet.readthedocs.io"
 Changelog = "https://github.com/hacf-fr/aio-ownet/releases"
 
 [dependency-groups]
@@ -42,16 +41,6 @@ dev = [
     "yamllint==1.38.0",
     "zizmor==1.31.1",
 ]
-# docs (Python >= 3.14)
-docs = [
-    "furo==2025.12.19; python_version >= '3.14'",
-    "myst-parser==5.1.0; python_version >= '3.14'",
-    "sphinx==9.2.0; python_version >= '3.14'",
-    "sphinx-autobuild==2025.8.25; python_version >= '3.14'",
-]
-
-[tool.uv]
-default-groups = ["dev", "docs"]
 
 [tool.codespell]
 skip = "node_modules,package-lock.json,uv.lock"
