@@ -7,13 +7,11 @@ welcomes contributions in the form of bug reports, feature requests, and pull re
 Here is a list of important resources for contributors:
 
 - [Source Code]
-- [Documentation]
 - [Issue Tracker]
 - [Code of Conduct]
 
 [mit license]: https://opensource.org/licenses/MIT
 [source code]: https://github.com/hacf-fr/aio-ownet
-[documentation]: https://aio-ownet.readthedocs.io/
 [issue tracker]: https://github.com/hacf-fr/aio-ownet/issues
 
 ## How to report a bug
@@ -70,19 +68,13 @@ $ uv run pytest
 Run the type checker:
 
 ```console
-$ uv run ty check src tests docs/conf.py
+$ uv run ty check src tests
 ```
 
 Run the linters and formatters:
 
 ```console
 $ uv run prek run --all-files
-```
-
-Build the documentation (Python 3.14+ only):
-
-```console
-$ uv run sphinx-build docs docs/_build
 ```
 
 Unit tests are located in the _tests_ directory,
@@ -98,7 +90,7 @@ Your pull request needs to meet the following guidelines for acceptance:
 
 - The test suite, type checks and linters must pass without errors and warnings.
 - Include unit tests. This project maintains 100% code coverage.
-- If your changes add functionality, update the documentation accordingly.
+- If your changes add functionality, update the README accordingly.
 
 Feel free to submit early, though—we can always iterate on this.
 
@@ -114,7 +106,4 @@ It is recommended to open an issue before starting work on anything.
 This will allow a chance to talk it over with the owners and validate your approach.
 
 [pull request]: https://github.com/hacf-fr/aio-ownet/pulls
-
-<!-- github-only -->
-
 [code of conduct]: CODE_OF_CONDUCT.md

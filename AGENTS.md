@@ -6,12 +6,11 @@ owserver network protocol to read, write and list 1-Wire devices.
 ## Commands
 
 ```console
-uv sync                                    # install (dev + docs groups by default)
+uv sync                                    # install (dev group by default)
 npm ci                                     # install prettier (Node version in .nvmrc)
 uv run pytest                              # tests
-uv run ty check src tests docs/conf.py     # type checking
+uv run ty check src tests                  # type checking
 uv run prek run --all-files                # ruff, prettier, codespell, yamllint, ...
-uv run sphinx-build docs docs/_build       # docs (Python 3.14+ only)
 ```
 
 CI runs the same commands with `--locked`; keep `uv.lock` in sync with
@@ -27,8 +26,9 @@ CI runs the same commands with `--locked`; keep `uv.lock` in sync with
   scales, device formats, common paths).
 - `src/aio_ownet/exceptions.py`: exception hierarchy rooted at
   `OWServerError`.
-- `example.py`: usage sample, also shown in the docs.
-- `docs/`: Sphinx with MyST Markdown.
+- `example.py`: usage sample.
+- `README.md`: user documentation (usage, API, exceptions); keep it in sync
+  with the public API.
 
 ## Conventions
 
